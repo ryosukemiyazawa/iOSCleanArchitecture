@@ -3,6 +3,8 @@ iOS + XCodegen + CleanArchitectureのサンプル
 
 アプリケーションをマルチモジュールで構成するサンプル。
 
+![](https://user-images.githubusercontent.com/8032972/96254077-a8e34880-0fef-11eb-8e16-79ec5cd735c9.png)
+
 - App アプリケーション本体。ViewControllerはここに設置
 
 - モジュール
