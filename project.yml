@@ -1,0 +1,164 @@
+# プロジェクト名(xcodeprojのファイル名になる)
+name: SampleApp
+
+options:
+
+  # BundleID（公開用のBundleIDをprefixとして指定する）
+  bundleIdPrefix: "dev"
+
+  # iOSの最低バージョン
+  deploymentTarget:
+    iOS: 13.0
+
+
+#  ターゲットの共通設定
+targetTemplates :
+  AppBase:
+    type: application
+    platform: iOS
+    deploymentTarget: "13.1"
+    sources:
+      - path: App/App
+
+    info:
+      properties:
+        CFBundleDevelopmentRegion: "ja_JP"
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
+        UILaunchStoryboardName: LaunchScreen
+        ITSAppUsesNonExemptEncryption: false
+        UIRequiresFullScreen: true
+
+        # ダークモード
+        UIUserInterfaceStyle: Light
+
+        # Main Storyboard
+        UIMainStoryboardFile: Main
+
+        # URL Scheme
+        CFBundleURLTypes:
+          - CFBundleTypeRole: Editor
+            CFBundleURLName: "xxx.xxx"
+            CFBundleURLSchemes:
+              - "xxxx"
+        
+        # Permission関連
+        NSPhotoLibraryUsageDescription: "Framework would like to store a photo."
+        
+        # Firebase
+        FirebaseAutomaticScreenReportingEnabled : true
+
+    settings:
+      base:
+        # BridgingHeader （ある場合のみ）
+        # SWIFT_OBJC_BRIDGING_HEADER: ${PRODUCT_NAME}/GA-Bridging-Header.h
+        CODE_SIGN_STYLE: Manual
+        ENABLE_BITCODE: No
+        GCC_C_LANGUAGE_STANDARD: gnu99
+        CLANG_CXX_LANGUAGE_STANDARD: gnu++0x
+        CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED: Yes
+
+        # User-Defineの項目（初期値を指定する）
+        SETTING_VALUE: "xxxxxx"
+
+    dependencies:
+      - target: AppCore
+      - target: Domain
+      - target: DataStore
+      - target: Presentation
+      
+      - carthage: Alamofire
+      
+      # Other
+      - sdk: Contacts.framework
+      - sdk: Security.framework
+
+targets:
+  # Adhoc開発用のApp
+  App:
+    templates: [AppBase]
+        
+    info:
+      path: App/App/Info.plist
+      
+      properties:
+        CFBundleDisplayName: "アプリ（開発用）"
+
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: "dev.SampleApp"
+  
+  # Core
+  AppCore:
+    type: framework
+    platform: iOS
+    sources: [App/Core]
+    info:
+      path: App/Core/Info.plist
+
+  # Domain
+  Domain:
+    type: framework
+    platform: iOS
+    sources: [App/Domain]
+    info:
+      path: App/Domain/Info.plist
+    dependencies:
+      - target: DataStore
+      - target: AppCore
+    
+  # DataStore
+  DataStore:
+    type: framework
+    platform: iOS
+    sources: [App/DataStore]
+    info:
+      path: App/DataStore/Info.plist
+    dependencies:
+      - carthage: Alamofire
+      - target: AppCore
+  
+  # Presentation
+  Presentation:
+    type: framework
+    platform: iOS
+    sources: [App/Presentation]
+    info:
+      path: App/Presentation/Info.plist
+    dependencies:
+      - target: Domain
+      - target: AppCore
+        
+  # Tests
+  AppTests:
+    type:  bundle.unit-test
+    platform: iOS
+    sources: [App/Tests]
+    dependencies:
+      - target: AppCore
+    settings:
+      CLANG_ENABLE_MODULES: YES
+      DEVELOPMENT_TEAM: XXXXXXXXXX
+
+  # UI Tests
+  AppUITests:
+    type:  bundle.ui-testing
+    platform: iOS
+    sources: [App/UITests]
+    dependencies:
+      - target: App
+    settings:
+      CLANG_ENABLE_MODULES: YES
+      DEVELOPMENT_TEAM: XXXXXXXXXX
+
+      
+# Scheme Setting (fastlane用)
+
+configs:
+  Debug: debug
+  Release: release
+
+schemes:
+  App:
+    build:
+      targets:
+        App: all
